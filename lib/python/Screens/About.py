@@ -38,16 +38,16 @@ class About(Screen):
 									})
 
 	def populate(self):
-		self["lab1"] = StaticText(_("Virtuosso Image Xtreme"))
-		self["lab2"] = StaticText(_("By Team ViX"))
+		self["lab1"] = StaticText(_("ViX4E2PROJECT"))
+		self["lab2"] = StaticText(_("By Lavatronics Antony"))
 		model = None
 		AboutText = ""
-		self["lab3"] = StaticText(_("Support at") + " www.world-of-satellite.com")
+		self["lab3"] = StaticText(_("www.ViX4.com"))
 
 		AboutText += _("Model:\t%s %s\n") % (getMachineBrand(), getMachineName())
 
 		if path.exists('/proc/stb/info/chipset'):
-			AboutText += _("Chipset:\tBCM%s\n") % about.getChipSetString()
+			AboutText += _("Chipset:\t%s\n") % about.getChipSetString()
 
 		AboutText += _("CPU:\t%s\n") % about.getCPUString()
 		AboutText += _("CPU Speed:\t%s\n") % about.getCPUSpeedString()
@@ -67,7 +67,6 @@ class About(Screen):
 		AboutText += _("GStreamer:\t%s\n") % about.getGStreamerVersionString().replace("GStreamer ","")
 		AboutText += _("Python:\t%s\n") % about.getPythonVersionString()
 
-		AboutText += _("Installed:\t%s\n") % about.getFlashDateString()
 		AboutText += _("Last update:\t%s\n\n") % getEnigmaVersionString()
 
 		fp_version = getFPVersion()
@@ -224,8 +223,8 @@ class SystemMemoryInfo(Screen):
 		Screen.__init__(self, session)
 		Screen.setTitle(self, _("Memory Information"))
 		self.skinName = ["SystemMemoryInfo", "About"]
-		self["lab1"] = StaticText(_("Virtuosso Image Xtreme"))
-		self["lab2"] = StaticText(_("By Team ViX"))
+		self["lab1"] = StaticText(_("ViX4E2PROJECT"))
+		self["lab2"] = StaticText(_("By Lavatronics Antony"))
 		self["AboutScrollLabel"] = ScrollLabel()
 
 		self["actions"] = ActionMap(["SetupActions", "ColorActions"],
