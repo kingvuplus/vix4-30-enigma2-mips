@@ -303,7 +303,7 @@ def InitUsageConfig():
 	config.epg.freesat = ConfigYesNo(default = True)
 	config.epg.viasat = ConfigYesNo(default = True)
 	config.epg.netmed = ConfigYesNo(default = True)
-	config.epg.virgin = ConfigYesNo(default = False)
+	config.epg.virgin = ConfigYesNo(default = True)
 
 	def EpgSettingsChanged(configElement):
 		mask = 0xffffffff
@@ -397,10 +397,10 @@ def InitUsageConfig():
 	config.network.uShare_autostart = ConfigYesNo(default = True)
 
 	config.softwareupdate = ConfigSubsection()
-	config.softwareupdate.autosettingsbackup = ConfigYesNo(default = True)
+	config.softwareupdate.autosettingsbackup = ConfigYesNo(default = False)
 	config.softwareupdate.autoimagebackup = ConfigYesNo(default = False)
-	config.softwareupdate.check = ConfigYesNo(default = True)
-	config.softwareupdate.checktimer = ConfigSelectionNumber(min = 1, max = 48, stepwidth = 1, default = 6, wraparound = True)
+	config.softwareupdate.check = ConfigYesNo(default = False)
+	config.softwareupdate.checktimer = ConfigSelectionNumber(min = 1, max = 48, stepwidth = 1, default = 6, wraparound = False)
 	config.softwareupdate.updatelastcheck = ConfigInteger(default=0)
 	config.softwareupdate.updatefound = NoSave(ConfigBoolean(default = False))
 	config.softwareupdate.updatebeta = ConfigYesNo(default = False)
@@ -708,7 +708,7 @@ def InitUsageConfig():
 	softcams = os.listdir('/usr/softcams/')
 	config.oscaminfo = ConfigSubsection()
 	config.oscaminfo.showInExtensions = ConfigYesNo(default=False)
-	config.oscaminfo.userdatafromconf = ConfigYesNo(default = True)
+	config.oscaminfo.userdatafromconf = ConfigYesNo(default = False)
 	config.oscaminfo.autoupdate = ConfigYesNo(default = False)
 	config.oscaminfo.username = ConfigText(default = "username", fixed_size = False, visible_width=12)
 	config.oscaminfo.password = ConfigPassword(default = "password", fixed_size = False)

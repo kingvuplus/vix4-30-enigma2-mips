@@ -32,13 +32,12 @@ def getChipSetString():
 		f = open('/proc/stb/info/chipset', 'r')
 		chipset = f.read()
 		f.close()
-		return str(chipset.lower().replace('\n','').replace('bcm','').replace('sti',''))
+		return str(chipset.lower().replace('\n','').replace('bcm',''))
 	except IOError:
 		return "unavailable"
 
 def getCPUSpeedString():
 	try:
-		mhz = "unknown"
 		file = open('/proc/cpuinfo', 'r')
 		lines = file.readlines()
 		for x in lines:
@@ -58,7 +57,6 @@ def getCPUSpeedString():
 
 def getCPUString():
 	try:
-		system="unknown"
 		file = open('/proc/cpuinfo', 'r')
 		lines = file.readlines()
 		for x in lines:
