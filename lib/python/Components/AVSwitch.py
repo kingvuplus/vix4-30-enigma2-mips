@@ -79,7 +79,7 @@ class AVSwitch:
 	if modes.has_key("Scart-YPbPr") and getBoxType() in ('vuduo2'):
 		modes["RCA"] = modes["Scart"]
 		del modes["Scart-YPbPr"]
-	if modes.has_key("YPbPr") and getBoxType() in ('amikomini', 'amikoalien', 'vuzero', 'et4x00', 'xp1000', 'tm2t', 'tmsingle', 'odimm7', 'vusolo2', 'tmnano','tmnanose', 'tmnano2super','tmnano3t','iqonios300hd', 'e3hd', 'dm500hdv2', 'dm500hd', 'dm800', 'ebox7358', 'eboxlumi', 'ebox5100','ixusszero', 'optimussos1', 'enfinity', 'uniboxhd1'):
+	if modes.has_key("YPbPr") and getBoxType() in ('amikomini', 'amikoalien', 'zgemmash1', 'zgemmash2', 'zgemmas2s', 'zgemmass', 'vuzero', 'et4x00', 'xp1000', 'tm2t', 'tmsingle', 'odimm7', 'vusolo2', 'tmnano','tmnanose', 'tmnano2super','tmnano3t','iqonios300hd', 'e3hd', 'dm500hdv2', 'dm500hd', 'dm800', 'ebox7358', 'eboxlumi', 'ebox5100','ixusszero', 'optimussos1', 'enfinity', 'uniboxhd1'):
 		del modes["YPbPr"]
 	if modes.has_key("Scart") and getBoxType() in ('vuzero', 'tmnano', 'tmnano3t','tmnano2super'):
 		modes["RCA"] = modes["Scart"]
