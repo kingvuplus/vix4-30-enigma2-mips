@@ -51,6 +51,9 @@ def profile(id):
 				elif getBoxType() in ("x1plus", "xcombo", "x2plus"):
 					f = open("/dev/dbox/oled0", "w")
 					f.write("%d" % perc)
+				elif getBoxType() in ("ixussone"):
+					f = open("/dev/dbox/lcd0", "w")
+					f.write("%d" % perc)
 				elif getBoxType() in ('gb800solo', 'gb800se', 'gb800seplus'):
 					f = open("/dev/mcu", "w")
 					f.write("%d  \n" % perc)
