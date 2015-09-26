@@ -3,7 +3,6 @@ import time
 from Tools.CList import CList
 from SystemInfo import SystemInfo
 from Components.Console import Console
-from Tools.HardwareInfo import HardwareInfo
 import Task
 
 def readFile(filename):
@@ -126,11 +125,7 @@ class Harddisk:
 			card = self.device[:2] == "hd" and "host0" not in self.dev_path
 			type_name = " (CF)"
 
-		hw_type = HardwareInfo().get_device_name()
-		if hw_type == 'elite' or hw_type == 'premium' or hw_type == 'premium+' or hw_type == 'ultra' :
-			internal = "ide" in self.phys_path
-		else:
-			internal = ("pci" or "ahci") in self.phys_path
+		internal = ("pci" or "ahci") in self.phys_path
 
 		if card:
 			ret += type_name
@@ -181,7 +176,7 @@ class Harddisk:
 		dev = self.findMount()
 		if dev:
 			stat = os.statvfs(dev)
-			return int((stat.f_bfree/1000) * (stat.f_bsize/1024))
+			return int((stat.f_bfree/1000) * (stat.f_bsize/1000))
 		return -1
 
 	def numPartitions(self):
@@ -334,11 +329,7 @@ class Harddisk:
 			else:
 				# Prefer optimal alignment for performance
 				alignment = 'opt'
-			if size > 2097151:
-				parttype = 'gpt'
-			else:
-				parttype = 'msdos'
-			task.args += ['-a', alignment, '-s', self.disk_path, 'mklabel', parttype, 'mkpart', 'primary', '0%', '100%']
+			task.args += ['-a', alignment, '-s', self.disk_path, 'mklabel', 'gpt', 'mkpart', 'primary', '0%', '100%']
 		else:
 			task.setTool('sfdisk')
 			task.args.append('-f')
@@ -490,10 +481,6 @@ class Harddisk:
 		self.timer = eTimer()
 		self.timer.callback.append(self.runIdle)
 		self.idle_running = True
-		self.hdd_timer = False
-		configsettings = readFile('/etc/enigma2/settings')
-		if "config.usage.hdd_timer" in configsettings:
-			self.hdd_timer = True
 		self.setIdleTime(self.max_idle_time) # kick the idle polling loop
 
 	def runIdle(self):
@@ -596,96 +583,25 @@ class Partition:
 						return fields[2]
 		return ''
 
-DEVICEDB = \
+DEVICEDB =  \
 	{"dm8000":
 		{
-			"/devices/pci0000:01/0000:01:00.0/host1/target1:0:0/1:0:0:0": _("SATA"),
-			"/devices/platform/brcm-ehci.0/usb1/1-1/1-1.1/1-1.1:1.0": _("Front USB"),
-			"/devices/platform/brcm-ehci.0/usb1/1-1/1-1.1/1-1.1.": _("Front USB"),
-			"/devices/platform/brcm-ehci.0/usb1/1-1/1-1.2/1-1.2:1.0": _("Back, upper USB"),
-			"/devices/platform/brcm-ehci.0/usb1/1-1/1-1.2/1-1.2.": _("Back, upper USB"),
-			"/devices/platform/brcm-ehci.0/usb1/1-1/1-1.3/1-1.3:1.0": _("Back, lower USB"),
-			"/devices/platform/brcm-ehci.0/usb1/1-1/1-1.3/1-1.3.": _("Back, lower USB"),
-			"/devices/platform/brcm-ehci-1.1/usb2/2-1/2-1:1.0/": _("Internal USB"),
-			"/devices/platform/brcm-ohci-1.1/usb4/4-1/4-1:1.0/": _("Internal USB"),
-			"/devices/platform/brcm-ehci.0/usb1/1-1/1-1.4/1-1.4.": _("Internal USB"),
+			# dm8000:
+			"/devices/platform/brcm-ehci.0/usb1/1-1/1-1.1/1-1.1:1.0": "Front USB Slot",
+			"/devices/platform/brcm-ehci.0/usb1/1-1/1-1.2/1-1.2:1.0": "Back, upper USB Slot",
+			"/devices/platform/brcm-ehci.0/usb1/1-1/1-1.3/1-1.3:1.0": "Back, lower USB Slot",
+			"/devices/platform/brcm-ehci-1.1/usb2/2-1/2-1:1.0/host1/target1:0:0/1:0:0:0": "DVD Drive",
 		},
-	"dm7020hd":
-	{
-		"/devices/pci0000:01/0000:01:00.0/host0/target0:0:0/0:0:0:0": _("SATA"),
-		"/devices/pci0000:01/0000:01:00.0/host1/target1:0:0/1:0:0:0": _("eSATA"),
-		"/devices/platform/brcm-ehci-1.1/usb2/2-1/2-1:1.0": _("Front USB"),
-		"/devices/platform/brcm-ehci-1.1/usb2/2-1/2-1.": _("Front USB"),
-		"/devices/platform/brcm-ehci.0/usb1/1-2/1-2:1.0": _("Back, upper USB"),
-		"/devices/platform/brcm-ehci.0/usb1/1-2/1-2.": _("Back, upper USB"),
-		"/devices/platform/brcm-ehci.0/usb1/1-1/1-1:1.0": _("Back, lower USB"),
-		"/devices/platform/brcm-ehci.0/usb1/1-1/1-1.": _("Back, lower USB"),
-	},
-	"dm7080":
-	{
-		"/devices/pci0000:00/0000:00:00.0/usb9/9-1/": _("Back USB 3.0"),
-		"/devices/pci0000:00/0000:00:00.0/usb9/9-2/": _("Front USB 3.0"),
-		"/devices/platform/ehci-brcm.0/": _("Back, lower USB"),
-		"/devices/platform/ehci-brcm.1/": _("Back, upper USB"),
-		"/devices/platform/ehci-brcm.2/": _("Internal USB"),
-		"/devices/platform/ehci-brcm.3/": _("Internal USB"),
-		"/devices/platform/ohci-brcm.0/": _("Back, lower USB"),
-		"/devices/platform/ohci-brcm.1/": _("Back, upper USB"),
-		"/devices/platform/ohci-brcm.2/": _("Internal USB"),
-		"/devices/platform/ohci-brcm.3/": _("Internal USB"),
-		"/devices/platform/sdhci-brcmstb.0/": _("eMMC"),
-		"/devices/platform/sdhci-brcmstb.1/": _("SD"),
-		"/devices/platform/strict-ahci.0/ata1/": _("SATA"),	# front
-		"/devices/platform/strict-ahci.0/ata2/": _("SATA"),	# back
-	},
 	"dm800":
 	{
-		"/devices/pci0000:01/0000:01:00.0/host0/target0:0:0/0:0:0:0": _("SATA"),
-		"/devices/platform/brcm-ehci.0/usb1/1-2/1-2:1.0": _("Upper USB"),
-		"/devices/platform/brcm-ehci.0/usb1/1-1/1-1:1.0": _("Lower USB"),
-	},
-	"dm820":
-	{
-		"/devices/platform/ehci-brcm.0/": _("Back, lower USB"),
-		"/devices/platform/ehci-brcm.1/": _("Back, upper USB"),
-		"/devices/platform/ehci-brcm.2/": _("Internal USB"),
-		"/devices/platform/ehci-brcm.3/": _("Internal USB"),
-		"/devices/platform/ohci-brcm.0/": _("Back, lower USB"),
-		"/devices/platform/ohci-brcm.1/": _("Back, upper USB"),
-		"/devices/platform/ohci-brcm.2/": _("Internal USB"),
-		"/devices/platform/ohci-brcm.3/": _("Internal USB"),
-		"/devices/platform/sdhci-brcmstb.0/": _("eMMC"),
-		"/devices/platform/sdhci-brcmstb.1/": _("SD"),
-		"/devices/platform/strict-ahci.0/ata1/": _("SATA"),     # front
-		"/devices/platform/strict-ahci.0/ata2/": _("SATA"),     # back
-	},
-	"dm800se":
-	{
-		"/devices/pci0000:01/0000:01:00.0/host0/target0:0:0/0:0:0:0": _("SATA"),
-		"/devices/pci0000:01/0000:01:00.0/host1/target1:0:0/1:0:0:0": _("eSATA"),
-		"/devices/platform/brcm-ehci.0/usb1/1-2/1-2:1.0": _("Upper USB"),
-		"/devices/platform/brcm-ehci.0/usb1/1-1/1-1:1.0": _("Lower USB"),
-	},
-	"dm500hd":
-	{
-		"/devices/pci0000:01/0000:01:00.0/host1/target1:0:0/1:0:0:0": _("eSATA"),
-		"/devices/pci0000:01/0000:01:00.0/host0/target0:0:0/0:0:0:0": _("eSATA"),
-	},
-	"dm800sev2":
-	{
-		"/devices/pci0000:01/0000:01:00.0/host0/target0:0:0/0:0:0:0": _("SATA"),
-		"/devices/pci0000:01/0000:01:00.0/host1/target1:0:0/1:0:0:0": _("eSATA"),
-		"/devices/platform/brcm-ehci.0/usb1/1-2/1-2:1.0": _("Upper USB"),
-		"/devices/platform/brcm-ehci.0/usb1/1-1/1-1:1.0": _("Lower USB"),
-	},
-	"dm500hdv2":
-	{
-		"/devices/pci0000:01/0000:01:00.0/host1/target1:0:0/1:0:0:0": _("eSATA"),
-		"/devices/pci0000:01/0000:01:00.0/host0/target0:0:0/0:0:0:0": _("eSATA"),
+		# dm800:
+		"/devices/platform/brcm-ehci.0/usb1/1-2/1-2:1.0": "Upper USB Slot",
+		"/devices/platform/brcm-ehci.0/usb1/1-1/1-1:1.0": "Lower USB Slot",
 	},
 	"dm7025":
 	{
-		"/devices/pci0000:00/0000:00:14.1/ide1/1.0": "Compact Flash", #hdc
+		# dm7025:
+		"/devices/pci0000:00/0000:00:14.1/ide1/1.0": "CF Card Slot", #hdc
 		"/devices/pci0000:00/0000:00:14.1/ide0/0.0": "Internal Harddisk"
 	}
 	}
@@ -726,7 +642,7 @@ class HarddiskManager:
 				dev = int(readFile(devpath + "/dev").split(':')[0])
 			else:
 				dev = None
-			if dev in (1, 7, 31, 253, 254, 179): # ram, loop, mtdblock, romblock, ramzswap, mmcblk
+			if dev in (1, 7, 31, 253): # ram, loop, mtdblock, romblock
 				blacklisted = True
 			if blockdev[0:2] == 'sr':
 				is_cdrom = True
@@ -809,9 +725,6 @@ class HarddiskManager:
 				physdev = dev
 				print "couldn't determine blockdev physdev for device", device
 		error, blacklisted, removable, is_cdrom, partitions, medium_found = self.getBlockDevInfo(self.splitDeviceName(device)[0])
-		hw_type = HardwareInfo().get_device_name()
-		if hw_type == 'elite' or hw_type == 'premium' or hw_type == 'premium+' or hw_type == 'ultra' :
-			if device[0:3] == "hda": blacklisted = True
 		if not blacklisted and medium_found:
 			description = self.getUserfriendlyDeviceName(device, physdev)
 			p = Partition(mountpoint = self.getMountpoint(device), description = description, force_mounted = True, device = device)
@@ -1008,6 +921,13 @@ class MkfsTask(Task.LoggingTask):
 				return # don't log the progess
 		self.log.append(data)
 
+
+def internalHDDNotSleeping():
+	if harddiskmanager.HDDCount():
+		for hdd in harddiskmanager.HDDList():
+			if ("pci" in hdd[1].phys_path or "ahci" in hdd[1].phys_path) and hdd[1].max_idle_time and not hdd[1].isSleeping():
+				return True
+	return False
 
 harddiskmanager = HarddiskManager()
 SystemInfo["ext4"] = isFileSystemSupported("ext4")
