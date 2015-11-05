@@ -50,6 +50,8 @@ eDVBScan::eDVBScan(iDVBChannel *channel, bool usePAT, bool debug)
 
 eDVBScan::~eDVBScan()
 {
+	if (m_lcn_file)
+		fclose(m_lcn_file);
 }
 
 int eDVBScan::isValidONIDTSID(int orbital_position, eOriginalNetworkID onid, eTransportStreamID tsid)
