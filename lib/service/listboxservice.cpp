@@ -78,9 +78,9 @@ void eListboxServiceContent::setRoot(const eServiceReference &root, bool justSet
 	ASSERT(m_service_center);
 
 	if (m_service_center->list(m_root, m_lst))
-		eDebug("no list available!");
+		eDebug("eListboxServiceContent: no list available!");
 	else if (m_lst->getContent(m_list))
-		eDebug("getContent failed");
+		eDebug("eListboxServiceContent: getContent failed");
 
 	FillFinished();
 }
@@ -375,26 +375,26 @@ int eListboxServiceContent::setCurrentMarked(bool state)
 			{
 				ePtr<iMutableServiceList> list;
 				if (m_lst->startEdit(list))
-					eDebug("no editable list");
+					eDebug("eListboxServiceContent: no editable list");
 				else
 				{
 					eServiceReference ref;
 					getCurrent(ref);
 					if(!ref)
-						eDebug("no valid service selected");
+						eDebug("eListboxServiceContent: no valid service selected");
 					else
 					{
 						int pos = cursorGet();
-						eDebugNoNewLineStart("move %s to %d ", ref.toString().c_str(), pos);
+						eDebugNoNewLineStart("eListboxServiceContent: move %s to %d ", ref.toString().c_str(), pos);
 						if (list->moveService(ref, cursorGet()))
-							eDebugNoNewLineEnd("failed");
+							eDebugNoNewLine("failed\n");
 						else
-							eDebugNoNewLineEnd("ok");
+							eDebugNoNewLine("ok\n");
 					}
 				}
 			}
 			else
-				eDebug("no list available!");
+				eDebug("eListboxServiceContent: no list available!");
 		}
 	}
 
@@ -551,10 +551,10 @@ void eListboxServiceContent::setItemHeight(int height)
 		m_listbox->setItemHeight(height);
 }
 
-bool eListboxServiceContent::checkServiceIsRecorded(eServiceReference ref,pNavigation::RecordType type)
+bool eListboxServiceContent::checkServiceIsRecorded(eServiceReference ref)
 {
 	std::map<ePtr<iRecordableService>, eServiceReference, std::less<iRecordableService*> > recordedServices;
-	recordedServices = eNavigation::getInstance()->getRecordingsServices(type);
+	recordedServices = eNavigation::getInstance()->getRecordingsServices();
 	for (std::map<ePtr<iRecordableService>, eServiceReference >::iterator it = recordedServices.begin(); it != recordedServices.end(); ++it)
 	{
 		if (ref.flags & eServiceReference::isGroup)
@@ -661,9 +661,7 @@ void eListboxServiceContent::paint(gPainter &painter, eWindowStyle &style, const
 		eServiceReference ref = *m_cursor;
 		bool isMarker = ref.flags & eServiceReference::isMarker;
 		bool isPlayable = !(ref.flags & eServiceReference::isDirectory || isMarker);
-		bool isRecorded = m_record_indicator_mode && isPlayable && checkServiceIsRecorded(ref,pNavigation::RecordType(pNavigation::isRealRecording|pNavigation::isUnknownRecording));
-		bool isStreamed = m_record_indicator_mode && isPlayable && checkServiceIsRecorded(ref,pNavigation::isStreaming);
-		bool isPseudoRecorded = m_record_indicator_mode && isPlayable && checkServiceIsRecorded(ref,pNavigation::isPseudoRecording);
+		bool isRecorded = m_record_indicator_mode && isPlayable && checkServiceIsRecorded(ref);
 		ePtr<eServiceEvent> evt;
 		bool serviceAvail = true;
 		bool serviceFallback = false;
@@ -690,20 +688,6 @@ void eListboxServiceContent::paint(gPainter &painter, eWindowStyle &style, const
 					serviceFallback = true;
 				}
 			}
-		}
-		if (m_record_indicator_mode == 3 && isPseudoRecorded)
-		{
-			if (m_color_set[servicePseudoRecorded])
-				painter.setForegroundColor(m_color[servicePseudoRecorded]);
-			else
-				painter.setForegroundColor(gRGB(0x41b1ec));
-		}
-		if (m_record_indicator_mode == 3 && isStreamed)
-		{
-			if (m_color_set[serviceStreamed])
-				painter.setForegroundColor(m_color[serviceStreamed]);
-			else
-				painter.setForegroundColor(gRGB(0xf56712));
 		}
 		if (m_record_indicator_mode == 3 && isRecorded)
 		{

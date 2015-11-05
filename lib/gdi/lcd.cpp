@@ -32,7 +32,7 @@ void eLCD::setSize(int xres, int yres, int bpp)
 	_buffer=new unsigned char[xres * yres * bpp/8];
 	memset(_buffer, 0, res.height()*res.width()*bpp/8);
 	_stride=res.width()*bpp/8;
-	eDebug("lcd buffer %p %d bytes, stride %d", _buffer, xres*yres*bpp/8, _stride);
+	eDebug("[LCD] buffer %p %d bytes, stride %d", _buffer, xres*yres*bpp/8, _stride);
 }
 
 eLCD::~eLCD()
@@ -73,62 +73,8 @@ eDBoxLCD::eDBoxLCD()
 	flipped = false;
 	inverted = 0;
 	lcd_type = 0;
-	FILE *boxtype_file;
-	char boxtype_name[20];
-	FILE *fp_file;
-	char fp_version[20];
 #ifndef NO_LCD
-	if((boxtype_file = fopen("/proc/stb/info/boxtype", "r")) != NULL)
-	{
-		fgets(boxtype_name, sizeof(boxtype_name), boxtype_file);
-		fclose(boxtype_file);
-		
-		if((strcmp(boxtype_name, "7300S\n") == 0) || (strcmp(boxtype_name, "xp1000s\n") == 0) || (strcmp(boxtype_name, "odinm7\n") == 0) || (strcmp(boxtype_name, "ew7358\n") == 0) || (strcmp(boxtype_name, "ew7362\n") == 0) || (strcmp(boxtype_name, "formuler3\n") == 0) || (strcmp(boxtype_name, "hd1100\n") == 0) || (strcmp(boxtype_name, "hd1200\n") == 0) || (strcmp(boxtype_name, "hd500c\n") == 0) || (strcmp(boxtype_name, "vp7358ci\n") == 0) || (strcmp(boxtype_name, "vg2000\n") == 0) || (strcmp(boxtype_name, "vg5000\n") == 0) || (strcmp(boxtype_name, "sh1\n") == 0) || (strcmp(boxtype_name, "yhgd2580\n") == 0) || (strcmp(boxtype_name, "spycatmini\n") == 0) || (strcmp(boxtype_name, "fegasusx3\n") == 0) || (strcmp(boxtype_name, "fegasusx5s\n") == 0) || (strcmp(boxtype_name, "fegasusx5t\n") == 0) || (strcmp(boxtype_name, "ini-2000oc\n") == 0) || (strcmp(boxtype_name, "osmini\n") == 0) || (strcmp(boxtype_name, "jj7362\n") == 0) || (strcmp(boxtype_name, "h3\n") == 0))
-		{
-			lcdfd = open("/dev/null", O_RDWR);
-		}
-		else if((strcmp(boxtype_name, "ini-1000de\n") == 0) || (strcmp(boxtype_name, "ini-2000am\n") == 0))
-		{
-				if((fp_file = fopen("/proc/stb/fp/version", "r")) != NULL)
-				{
-					fgets(fp_version, sizeof(fp_version), fp_file);
-					fclose(fp_file);
-				}
-				if(strcmp(fp_version, "0\n") == 0) 
-				{
-					lcdfd = open("/dev/null", O_RDWR);
-				}
-				else
-				{
-					lcdfd = open("/dev/dbox/oled0", O_RDWR);
-				}
-		}
-		else if((strcmp(boxtype_name, "spark\n") == 0))
-		{
-				if((fp_file = fopen("/proc/stb/fp/version", "r")) != NULL)
-				{
-					fgets(fp_version, sizeof(fp_version), fp_file);
-					fclose(fp_file);
-				}
-				if(strcmp(fp_version, "4\n") == 0)
-				{
-					lcdfd = open("/dev/null", O_RDWR);
-				}
-				else
-				{
-					lcdfd = open("/dev/dbox/oled0", O_RDWR);
-				}
-		}		
-		else
-		{
-			lcdfd = open("/dev/dbox/oled0", O_RDWR);
-		}		
-	}	
-	else
-	{
-		lcdfd = open("/dev/dbox/oled0", O_RDWR);
-	}
-	
+	lcdfd = open("/dev/dbox/oled0", O_RDWR);
 	if (lcdfd < 0)
 	{
 		if (!access("/proc/stb/lcd/oled_brightness", W_OK) || !access("/proc/stb/fp/oled_brightness", W_OK) )
@@ -136,12 +82,12 @@ eDBoxLCD::eDBoxLCD()
 		lcdfd = open("/dev/dbox/lcd0", O_RDWR);
 	} else
 	{
-		eDebug("found OLED display!");
+		eDebug("[DboxLCD] found OLED display!");
 		lcd_type = 1;
 	}
 
 	if (lcdfd < 0)
-		eDebug("couldn't open LCD - load lcd.ko!");
+		eDebug("[DboxLCD] couldn't open LCD - load lcd.ko!");
 	else
 	{
 
@@ -213,13 +159,13 @@ int eDBoxLCD::setLCDContrast(int contrast)
 	int fp;
 	if((fp=open("/dev/dbox/fp0", O_RDWR))<0)
 	{
-		eDebug("[LCD] can't open /dev/dbox/fp0");
+		eDebug("[DboxLCD] can't open /dev/dbox/fp0");
 		return(-1);
 	}
 
 	if(ioctl(lcdfd, LCD_IOCTL_SRV, &contrast)<0)
 	{
-		eDebug("[LCD] can't set lcd contrast");
+		eDebug("[DboxLCD] can't set lcd contrast");
 	}
 	close(fp);
 #endif
@@ -229,14 +175,14 @@ int eDBoxLCD::setLCDContrast(int contrast)
 int eDBoxLCD::setLCDBrightness(int brightness)
 {
 #ifndef NO_LCD
-//	eDebug("setLCDBrightness %d", brightness);
+	eDebug("[DboxLCD] setLCDBrightness %d", brightness);
 	FILE *f=fopen("/proc/stb/lcd/oled_brightness", "w");
 	if (!f)
 		f = fopen("/proc/stb/fp/oled_brightness", "w");
 	if (f)
 	{
 		if (fprintf(f, "%d", brightness) == 0)
-			eDebug("write /proc/stb/lcd/oled_brightness failed!! (%m)");
+			eDebug("[DboxLCD] write /proc/stb/lcd/oled_brightness failed!! (%m)");
 		fclose(f);
 	}
 	else
@@ -244,14 +190,14 @@ int eDBoxLCD::setLCDBrightness(int brightness)
 		int fp;
 		if((fp=open("/dev/dbox/fp0", O_RDWR)) < 0)
 		{
-			eDebug("[LCD] can't open /dev/dbox/fp0");
+			eDebug("[DboxLCD] can't open /dev/dbox/fp0");
 			return(-1);
 		}
 #ifndef FP_IOCTL_LCD_DIMM
 #define FP_IOCTL_LCD_DIMM       3
 #endif
 		if(ioctl(fp, FP_IOCTL_LCD_DIMM, &brightness) < 0)
-			eDebug("[LCD] can't set lcd brightness");
+			eDebug("[DboxLCD] can't set lcd brightness (%m)");
 		close(fp);
 	}
 #endif
@@ -278,7 +224,6 @@ int eDBoxLCD::setLED(int value, int option)
 				eDebug("[LED] can't set led blinking time");
 			break;
 	}
-	return(0);
 }
 
 eDBoxLCD::~eDBoxLCD()
@@ -349,40 +294,16 @@ void eDBoxLCD::update()
 			}
 			else
 			{
-				FILE *file;
-				FILE *boxtype_file;
-				char boxtype_name[20];
-				if((boxtype_file = fopen("/proc/stb/info/boxtype", "r")) != NULL)
+				if (FILE * file = fopen("/proc/stb/info/gbmodel", "r"))
 				{
-					fgets(boxtype_name, sizeof(boxtype_name), boxtype_file);
-					fclose(boxtype_file);
-				}
-				if (((file = fopen("/proc/stb/info/gbmodel", "r")) != NULL ) || (strcmp(boxtype_name, "7100S\n") == 0))
-				{
-					//gggrrrrrbbbbbggg bit order from memory
-					//gggbbbbbrrrrrggg bit order to LCD
 					unsigned char gb_buffer[_stride * res.height()];
-					if(! (0x03 & (_stride * res.height())))
-					{//fast
-						for (int offset = 0; offset < ((_stride * res.height())>>2); offset ++)
-						{
-							unsigned int src = ((unsigned int*)_buffer)[offset];
-							((unsigned int*)gb_buffer)[offset] = src & 0xE007E007 | (src & 0x1F001F00) >>5 | (src & 0x00F800F8) << 5;
-						}
-					}
-					else
-					{//slow
-						for (int offset = 0; offset < _stride * res.height(); offset += 2)
-						{
-							gb_buffer[offset] = (_buffer[offset] & 0x07) | ((_buffer[offset + 1] << 3) & 0xE8);
-							gb_buffer[offset + 1] = (_buffer[offset + 1] & 0xE0)| ((_buffer[offset] >> 3) & 0x1F);
-						}
+					for (int offset = 0; offset < _stride * res.height(); offset += 2)
+					{
+						gb_buffer[offset] = (_buffer[offset] & 0x1F) | ((_buffer[offset + 1] << 3) & 0xE0);
+						gb_buffer[offset + 1] = ((_buffer[offset + 1] >> 5) & 0x03) | ((_buffer[offset] >> 3) & 0x1C) | ((_buffer[offset + 1] << 5) & 0x60);
 					}
 					write(lcdfd, gb_buffer, _stride * res.height());
-					if (file != NULL)
-					{
-						fclose(file);
-					}
+					fclose(file);
 				}
 				else
 				{
