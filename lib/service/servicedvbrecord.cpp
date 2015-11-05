@@ -4,6 +4,7 @@
 #include <lib/dvb/metaparser.h>
 #include <lib/base/httpstream.h>
 #include <fcntl.h>
+#include <lib/base/nconfig.h>
 
 	/* for cutlist */
 #include <byteswap.h>
@@ -31,12 +32,12 @@ eDVBServiceRecord::eDVBServiceRecord(const eServiceReferenceDVB &ref, bool isstr
 
 void eDVBServiceRecord::serviceEvent(int event)
 {
-	eDebug("eDVBServiceRecord: RECORD service event %d", event);
+	eDebug("RECORD service event %d", event);
 	switch (event)
 	{
 	case eDVBServicePMTHandler::eventTuned:
 	{
-		eDebug("eDVBServiceRecord: tuned..");
+		eDebug("tuned..");
 		m_tuned = 1;
 
 			/* start feeding EIT updates */
@@ -61,7 +62,7 @@ void eDVBServiceRecord::serviceEvent(int event)
 	}
 	case eDVBServicePMTHandler::eventTuneFailed:
 	{
-		eDebug("eDVBServiceRecord: record failed to tune");
+		eDebug("record failed to tune");
 		m_event((iRecordableService*)this, evTuneFailed);
 		break;
 	}
@@ -182,7 +183,7 @@ RESULT eDVBServiceRecord::start(bool simulate)
 RESULT eDVBServiceRecord::stop()
 {
 	if (!m_simulate)
-		eDebug("eDVBServiceRecord: stop recording!");
+		eDebug("stop recording!");
 	if (m_state == stateRecording)
 	{
 		if (m_record)
@@ -197,7 +198,7 @@ RESULT eDVBServiceRecord::stop()
 
 		m_state = statePrepared;
 	} else if (!m_simulate)
-		eDebug("eDVBServiceRecord: (was not recording)");
+		eDebug("(was not recording)");
 	if (m_state == statePrepared)
 	{
 		m_record = 0;
@@ -272,12 +273,12 @@ int eDVBServiceRecord::doRecord()
 
 	if (!m_record && m_tuned && !m_streaming && !m_simulate)
 	{
-		eDebug("eDVBServiceRecord: Recording to %s...", m_filename.c_str());
+		eDebug("Recording to %s...", m_filename.c_str());
 		::remove(m_filename.c_str());
 		int fd = ::open(m_filename.c_str(), O_WRONLY | O_CREAT | O_LARGEFILE | O_CLOEXEC, 0666);
 		if (fd == -1)
 		{
-			eDebug("eDVBServiceRecord: can't open recording file!");
+			eDebug("eDVBServiceRecord - can't open recording file!");
 			m_error = errOpenRecordFile;
 			m_event((iRecordableService*)this, evRecordFailed);
 			return errOpenRecordFile;
@@ -286,7 +287,7 @@ int eDVBServiceRecord::doRecord()
 		ePtr<iDVBDemux> demux;
 		if (m_service_handler.getDataDemux(demux))
 		{
-			eDebug("eDVBServiceRecord: NO DEMUX available!");
+			eDebug("eDVBServiceRecord - NO DEMUX available!");
 			m_error = errNoDemuxAvailable;
 			m_event((iRecordableService*)this, evRecordFailed);
 			return errNoDemuxAvailable;
@@ -294,7 +295,7 @@ int eDVBServiceRecord::doRecord()
 		demux->createTSRecorder(m_record);
 		if (!m_record)
 		{
-			eDebug("eDVBServiceRecord: no ts recorder available.");
+			eDebug("eDVBServiceRecord - no ts recorder available.");
 			m_error = errNoTsRecorderAvailable;
 			m_event((iRecordableService*)this, evRecordFailed);
 			return errNoTsRecorderAvailable;
@@ -309,14 +310,14 @@ int eDVBServiceRecord::doRecord()
 	if (m_streaming)
 	{
 		m_state = stateRecording;
-		eDebug("eDVBServiceRecord: start streaming...");
+		eDebug("start streaming...");
 	} else
 	{
-		eDebug("eDVBServiceRecord: start recording...");
+		eDebugNoNewLineStart("start recording...");
 
 		eDVBServicePMTHandler::program program;
 		if (m_service_handler.getProgramInfo(program))
-			eDebug("eDVBServiceRecord: getting program info failed.");
+			eDebug("getting program info failed.");
 		else
 		{
 			std::set<int> pids_to_record;
@@ -329,7 +330,7 @@ int eDVBServiceRecord::doRecord()
 			int timing_pid = -1, timing_stream_type = -1;
 			iDVBTSRecorder::timing_pid_type timing_pid_type = iDVBTSRecorder::none;
 
-			eDebugNoNewLineStart("eDVBServiceRecord: RECORD: have %zd video stream(s)", program.videoStreams.size());
+			eDebugNoNewLine("RECORD: have %zd video stream(s)", program.videoStreams.size());
 			if (!program.videoStreams.empty())
 			{
 				eDebugNoNewLine(" (");
@@ -393,7 +394,7 @@ int eDVBServiceRecord::doRecord()
 			eDebugNoNewLine(", and the pcr pid is %04x", program.pcrPid);
 			if (program.pcrPid >= 0 && program.pcrPid < 0x1fff)
 				pids_to_record.insert(program.pcrPid);
-			eDebugNoNewLine(", and the text pid is %04x\n", program.textPid);
+			eDebugNoNewLineEnd(", and the text pid is %04x", program.textPid);
 			if (program.textPid != -1)
 				pids_to_record.insert(program.textPid); // Videotext
 
@@ -406,7 +407,14 @@ int eDVBServiceRecord::doRecord()
 				}
 			}
 
-				/* find out which pids are NEW and which pids are obsolete.. */
+			bool include_ait = eConfigManager::getConfigBoolValue("config.recording.include_ait");
+			if (include_ait)
+			{
+				/* add AIT pid (if any) */
+				if (program.aitPid >= 0) pids_to_record.insert(program.aitPid);
+			}
+
+			/* find out which pids are NEW and which pids are obsolete.. */
 			std::set<int> new_pids, obsolete_pids;
 
 			std::set_difference(pids_to_record.begin(), pids_to_record.end(),
@@ -421,13 +429,13 @@ int eDVBServiceRecord::doRecord()
 
 			for (std::set<int>::iterator i(new_pids.begin()); i != new_pids.end(); ++i)
 			{
-				eDebug("eDVBServiceRecord: ADD PID: %04x", *i);
+				eDebug("ADD PID: %04x", *i);
 				m_record->addPID(*i);
 			}
 
 			for (std::set<int>::iterator i(obsolete_pids.begin()); i != obsolete_pids.end(); ++i)
 			{
-				eDebug("eDVBServiceRecord: REMOVED PID: %04x", *i);
+				eDebug("REMOVED PID: %04x", *i);
 				m_record->removePID(*i);
 			}
 
@@ -488,7 +496,7 @@ void eDVBServiceRecord::recordEvent(int event)
 		m_event((iRecordableService*)this, evRecordWriteError);
 		return;
 	default:
-		eDebug("eDVBServiceRecord: unhandled record event %d", event);
+		eDebug("unhandled record event %d", event);
 	}
 }
 
@@ -507,11 +515,11 @@ void eDVBServiceRecord::gotNewEvent(int /*error*/)
 	if (m_record)
 	{
 		if (m_record->getCurrentPCR(p))
-			eDebug("eDVBServiceRecord: getting PCR failed!");
+			eDebug("getting PCR failed!");
 		else
 		{
 			m_event_timestamps[event_id] = p;
-			eDebug("eDVBServiceRecord: pcr of eit change: %llx", p);
+			eDebug("pcr of eit change: %llx", p);
 		}
 	}
 
@@ -552,7 +560,7 @@ void eDVBServiceRecord::saveCutlist()
 				eDebug("[eDVBServiceRecord] fixing up PTS failed, not saving");
 				continue;
 			}
-			eDebug("eDVBServiceRecord: fixed up %llx to %llx (offset %llx)", i->second, p, offset);
+			eDebug("fixed up %llx to %llx (offset %llx)", i->second, p, offset);
 			where = htobe64(p);
 			what = htonl(2); /* mark */
 			fwrite(&where, sizeof(where), 1, f);

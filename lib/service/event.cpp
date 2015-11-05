@@ -11,7 +11,6 @@
 #include <dvbsi++/content_descriptor.h>
 #include <dvbsi++/parental_rating_descriptor.h>
 #include <dvbsi++/descriptor_tag.h>
-#include <dvbsi++/pdc_descriptor.h>
 
 #include <sys/types.h>
 #include <fcntl.h>
@@ -162,12 +161,6 @@ bool eServiceEvent::loadLanguage(Event *evt, const std::string &lang, int tsidon
 					}
 					break;
 				}
-				case PDC_DESCRIPTOR:
-				{
-					const PdcDescriptor *pdcd = (PdcDescriptor *)*desc;
-					m_pdc_pil = pdcd->getProgrammeIdentificationLabel();
-					break;
-				}
 			}
 		}
 	}
@@ -182,8 +175,6 @@ RESULT eServiceEvent::parseFrom(Event *evt, int tsidonid)
 	m_event_id = evt->getEventId();
 	uint32_t duration = evt->getDuration();
 	m_duration = fromBCD(duration>>16)*3600+fromBCD(duration>>8)*60+fromBCD(duration);
-	uint8_t running_status = evt->getRunningStatus();
-	m_running_status = running_status;
 	if (m_language != "---" && loadLanguage(evt, m_language, tsidonid))
 		return 0;
 	if (m_language_alternative != "---" && loadLanguage(evt, m_language_alternative, tsidonid))

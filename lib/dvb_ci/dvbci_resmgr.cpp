@@ -5,28 +5,34 @@
 
 int eDVBCIResourceManagerSession::receivedAPDU(const unsigned char *tag,const void *data, int len)
 {
-	eDebugNoNewLineStart("[CI] SESSION(%d) %02x %02x %02x: ", session_nb, tag[0], tag[1], tag[2]);
+#ifdef __sh__
+	eDebug("eDVBCIResourceManagerSession::%s >", __func__);
+	eDebugNoNewLineStart("SESSION(%d) %02x %02x %02x (len = %d): ", session_nb, tag[0], tag[1], tag[2], len);
+#else
+	eDebugNoNewLineStart("SESSION(%d) %02x %02x %02x: ", session_nb, tag[0], tag[1], tag[2]);
+#endif
 	for (int i=0; i<len; i++)
 		eDebugNoNewLine("%02x ", ((const unsigned char*)data)[i]);
-	eDebugNoNewLine("\n");
+	eDebugNoNewLineEnd("");
 	if ((tag[0]==0x9f) && (tag[1]==0x80))
 	{
 		switch (tag[2])
 		{
 		case 0x10:  // profile enquiry
-			eDebug("[CI] cam profile inquiry");
+			eDebug("cam fragt was ich kann.");
 			state=stateProfileEnquiry;
 			return 1;
 			break;
 		case 0x11: // Tprofile
-			eDebugNoNewLineStart("[CI] can do: ");
+			eDebugNoNewLineStart("mein cam kann: ");
 			if (!len)
-				eDebugNoNewLine("nothing");
+				eDebugNoNewLineEnd("nichts");
 			else
+			{
 				for (int i=0; i<len; i++)
 					eDebugNoNewLine("%02x ", ((const unsigned char*)data)[i]);
-			eDebugNoNewLine("\n");
-
+				eDebugNoNewLineEnd("");
+			}
 			if (state == stateFirstProfileEnquiry)
 			{
 				// profile change
@@ -35,7 +41,7 @@ int eDVBCIResourceManagerSession::receivedAPDU(const unsigned char *tag,const vo
 			state=stateFinal;
 			break;
 		default:
-			eDebug("[CI] unknown APDU tag 9F 80 %02x", tag[2]);
+			eDebug("unknown APDU tag 9F 80 %02x", tag[2]);
 		}
 	}
 
@@ -62,7 +68,7 @@ int eDVBCIResourceManagerSession::doAction()
 	}
 	case stateProfileChange:
 	{
-		eDebug("[CI] cannot deal with statProfileChange");
+		eDebug("bla kaputt");
 		break;
 	}
 	case stateProfileEnquiry:
@@ -83,7 +89,7 @@ int eDVBCIResourceManagerSession::doAction()
 		return 0;
 	}
 	case stateFinal:
-		eDebug("[CI] stateFinal und action! kann doch garnicht sein ;)");
+		eDebug("stateFinal und action! kann doch garnicht sein ;)");
 	default:
 		break;
 	}
