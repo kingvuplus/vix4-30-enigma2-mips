@@ -4,6 +4,7 @@
 #include <dvbsi++/service_descriptor.h>
 #include <dvbsi++/satellite_delivery_system_descriptor.h>
 #include <dvbsi++/terrestrial_delivery_system_descriptor.h>
+#include <dvbsi++/logical_channel_descriptor.h>
 #include <dvbsi++/cable_delivery_system_descriptor.h>
 #include <dvbsi++/ca_identifier_descriptor.h>
 #include <dvbsi++/registration_descriptor.h>
@@ -20,6 +21,7 @@
 #include <lib/base/estring.h>
 #include <lib/dvb/dvb.h>
 #include <lib/dvb/db.h>
+#include <lib/python/python.h>
 #include <errno.h>
 
 #define SCAN_eDebug(x...) do { if (m_scan_debug) eDebug(x); } while(0)
