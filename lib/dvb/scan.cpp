@@ -348,7 +348,7 @@ void eDVBScan::NITready(int err)
 
 void eDVBScan::BATready(int err)
 {
-	SCAN_eDebug("got bat, err %d", err);
+	SCAN_eDebug("got bat");
 	m_ready |= readyBAT;
 	if (!err)
 		m_ready |= validBAT;
@@ -357,7 +357,7 @@ void eDVBScan::BATready(int err)
 
 void eDVBScan::PATready(int err)
 {
-	SCAN_eDebug("got pat, err %d", err);
+	SCAN_eDebug("got pat");
 	m_ready |= readyPAT;
 	if (!err)
 		m_ready |= validPAT;
@@ -381,7 +381,7 @@ void eDVBScan::PMTready(int err)
 			if (pcrpid == 0xFFFF)
 				pcrpid = pmt.getPcrPid();
 			else
-				SCAN_eDebug("  already have a pcrpid %04x %04x", pcrpid, pmt.getPcrPid());
+	                	SCAN_eDebug("already have a pcrpid %04x %04x", pcrpid, pmt.getPcrPid());			
 			ElementaryStreamInfoConstIterator es;
 			for (es = pmt.getEsInfo()->begin(); es != pmt.getEsInfo()->end(); ++es)
 			{
