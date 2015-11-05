@@ -200,8 +200,10 @@ RESULT eDVBScan::nextChannel()
 
 	if (m_ch_toScan.empty())
 	{
-		SCAN_eDebug("no channels left: %zd scanned, %zd unavailable, %zd database.",
-			m_ch_scanned.size(), m_ch_unavailable.size(), m_new_channels.size());
+		SCAN_eDebug("no channels left to scan.");
+		SCAN_eDebug("%zd channels scanned, %zd were unavailable.",
+				m_ch_scanned.size(), m_ch_unavailable.size());
+		SCAN_eDebug("%zd channels in database.", m_new_channels.size());
 		m_event(evtFinish);
 		return -ENOENT;
 	}
