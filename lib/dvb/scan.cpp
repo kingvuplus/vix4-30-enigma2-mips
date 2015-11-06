@@ -500,10 +500,6 @@ void eDVBScan::addKnownGoodChannel(const eDVBChannelID &chid, iDVBFrontendParame
 		m_new_channels.insert(std::pair<eDVBChannelID,ePtr<iDVBFrontendParameters> >(chid, feparm));
 }
 
-void eDVBScan::addLcnToDB(eDVBNamespace ns, eOriginalNetworkID onid, eTransportStreamID tsid, eServiceID sid, uint16_t lcn, uint32_t signal)
-{
-
-
 void eDVBScan::addChannelToScan(iDVBFrontendParameters *feparm)
 {
 		/* check if we don't already have that channel ... */
