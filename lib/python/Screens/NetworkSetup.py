@@ -1647,7 +1647,13 @@ class NetworkAfp(Screen):
 
 	def checkNetworkState(self, str, retval, extra_args):
 		if 'Collected errors' in str:
-			self.session.openWithCallback(self.close, MessageBox, _("A background update check is in progress, please wait a few minutes and then try again."), type=MessageBox.TYPE_INFO, timeout=10, close_on_any_key=True)
+			self.session.openWithCallback(self.close, MessageBox, _("A background update check is in progress, please wait a few minutes and try again."), type=MessageBox.TYPE_INFO, timeout=10, close_on_any_key=True)
+		elif not str:
+			self.feedscheck = self.session.open(MessageBox,_('Please wait whilst feeds state is checked.'), MessageBox.TYPE_INFO, enable_input = False)
+			self.feedscheck.setTitle(_('Checking Feeds'))
+			cmd1 = "opkg update"
+			self.CheckConsole = Console()
+			self.CheckConsole.ePopen(cmd1, self.checkNetworkStateFinished)
 		else:
 			self.updateService()
 
@@ -1848,7 +1854,13 @@ class NetworkNfs(Screen):
 
 	def checkNetworkState(self, str, retval, extra_args):
 		if 'Collected errors' in str:
-			self.session.openWithCallback(self.close, MessageBox, _("A background update check is in progress, please wait a few minutes and then try again."), type=MessageBox.TYPE_INFO, timeout=10, close_on_any_key=True)
+			self.session.openWithCallback(self.close, MessageBox, _("A background update check is in progress, please wait a few minutes and try again."), type=MessageBox.TYPE_INFO, timeout=10, close_on_any_key=True)
+		elif not str:
+			self.feedscheck = self.session.open(MessageBox,_('Please wait whilst feeds state is checked.'), MessageBox.TYPE_INFO, enable_input = False)
+			self.feedscheck.setTitle(_('Checking Feeds'))
+			cmd1 = "opkg update"
+			self.CheckConsole = Console()
+			self.CheckConsole.ePopen(cmd1, self.checkNetworkStateFinished)
 		else:
 			self.updateService()
 
@@ -1969,7 +1981,13 @@ class NetworkOpenvpn(Screen):
 
 	def checkNetworkState(self, str, retval, extra_args):
 		if 'Collected errors' in str:
-			self.session.openWithCallback(self.close, MessageBox, _("A background update check is in progress, please wait a few minutes and then try again."), type=MessageBox.TYPE_INFO, timeout=10, close_on_any_key=True)
+			self.session.openWithCallback(self.close, MessageBox, _("A background update check is in progress, please wait a few minutes and try again."), type=MessageBox.TYPE_INFO, timeout=10, close_on_any_key=True)
+		elif not str:
+			self.feedscheck = self.session.open(MessageBox,_('Please wait whilst feeds state is checked.'), MessageBox.TYPE_INFO, enable_input = False)
+			self.feedscheck.setTitle(_('Checking Feeds'))
+			cmd1 = "opkg update"
+			self.CheckConsole = Console()
+			self.CheckConsole.ePopen(cmd1, self.checkNetworkStateFinished)
 		else:
 			self.updateService()
 
@@ -2112,7 +2130,13 @@ class NetworkSamba(Screen):
 
 	def checkNetworkState(self, str, retval, extra_args):
 		if 'Collected errors' in str:
-			self.session.openWithCallback(self.close, MessageBox, _("A background update check is in progress, please wait a few minutes and then try again."), type=MessageBox.TYPE_INFO, timeout=10, close_on_any_key=True)
+			self.session.openWithCallback(self.close, MessageBox, _("A background update check is in progress, please wait a few minutes and try again."), type=MessageBox.TYPE_INFO, timeout=10, close_on_any_key=True)
+		elif not str:
+			self.feedscheck = self.session.open(MessageBox,_('Please wait whilst feeds state is checked.'), MessageBox.TYPE_INFO, enable_input = False)
+			self.feedscheck.setTitle(_('Checking Feeds'))
+			cmd1 = "opkg update"
+			self.CheckConsole = Console()
+			self.CheckConsole.ePopen(cmd1, self.checkNetworkStateFinished)
 		else:
 			self.updateService()
 
@@ -2357,7 +2381,13 @@ class NetworkInadyn(Screen):
 
 	def checkNetworkState(self, str, retval, extra_args):
 		if 'Collected errors' in str:
-			self.session.openWithCallback(self.close, MessageBox, _("A background update check is in progress, please wait a few minutes and then try again."), type=MessageBox.TYPE_INFO, timeout=10, close_on_any_key=True)
+			self.session.openWithCallback(self.close, MessageBox, _("A background update check is in progress, please wait a few minutes and try again."), type=MessageBox.TYPE_INFO, timeout=10, close_on_any_key=True)
+		elif not str:
+			self.feedscheck = self.session.open(MessageBox,_('Please wait whilst feeds state is checked.'), MessageBox.TYPE_INFO, enable_input = False)
+			self.feedscheck.setTitle(_('Checking Feeds'))
+			cmd1 = "opkg update"
+			self.CheckConsole = Console()
+			self.CheckConsole.ePopen(cmd1, self.checkNetworkStateFinished)
 		else:
 			self.updateService()
 
@@ -2689,7 +2719,13 @@ class NetworkuShare(Screen):
 
 	def checkNetworkState(self, str, retval, extra_args):
 		if 'Collected errors' in str:
-			self.session.openWithCallback(self.close, MessageBox, _("A background update check is in progress, please wait a few minutes and then try again."), type=MessageBox.TYPE_INFO, timeout=10, close_on_any_key=True)
+			self.session.openWithCallback(self.close, MessageBox, _("A background update check is in progress, please wait a few minutes and try again."), type=MessageBox.TYPE_INFO, timeout=10, close_on_any_key=True)
+		elif not str:
+			self.feedscheck = self.session.open(MessageBox,_('Please wait whilst feeds state is checked.'), MessageBox.TYPE_INFO, enable_input = False)
+			self.feedscheck.setTitle(_('Checking Feeds'))
+			cmd1 = "opkg update"
+			self.CheckConsole = Console()
+			self.CheckConsole.ePopen(cmd1, self.checkNetworkStateFinished)
 		else:
 			self.updateService()
 
@@ -3158,20 +3194,17 @@ class NetworkMiniDLNA(Screen):
 	def InstallCheck(self):
 		self.Console.ePopen('/usr/bin/opkg list_installed ' + self.service_name, self.checkNetworkState)
 
-
 	def checkNetworkState(self, str, retval, extra_args):
 		if 'Collected errors' in str:
 			self.session.openWithCallback(self.close, MessageBox, _("A background update check is in progress, please wait a few minutes and try again."), type=MessageBox.TYPE_INFO, timeout=10, close_on_any_key=True)
+		elif not str:
+			self.feedscheck = self.session.open(MessageBox,_('Please wait whilst feeds state is checked.'), MessageBox.TYPE_INFO, enable_input = False)
+			self.feedscheck.setTitle(_('Checking Feeds'))
+			cmd1 = "opkg update"
+			self.CheckConsole = Console()
+			self.CheckConsole.ePopen(cmd1, self.checkNetworkStateFinished)
 		else:
 			self.updateService()
-
-	def checkNetworkStateFinished(self, result, retval,extra_args=None):
-		if 'bad address' in result:
-			self.session.openWithCallback(self.InstallPackageFailed, MessageBox, _("Your %s %s is not connected to the internet, please check your network settings and try again.") % (getMachineBrand(), getMachineName()), type=MessageBox.TYPE_INFO, timeout=10, close_on_any_key=True)
-		elif ('wget returned 1' or 'wget returned 255' or '404 Not Found') in result:
-			self.session.openWithCallback(self.InstallPackageFailed, MessageBox, _("Sorry feeds are down for maintenance, please try again later."), type=MessageBox.TYPE_INFO, timeout=10, close_on_any_key=True)
-		else:
-			self.session.openWithCallback(self.InstallPackage,MessageBox,_('Your %s %s will be restarted after the installation of service\nReady to install "%s" ?') % (getMachineBrand(), getMachineName(), self.service_name), MessageBox.TYPE_YESNO)
 
 	def InstallPackage(self, val):
 		if val:
