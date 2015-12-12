@@ -81,7 +81,7 @@ class AVSwitch:
 		del modes["Scart-YPbPr"]
 	if modes.has_key("YPbPr") and getBoxType() in ('evomini', 'x1plus', 'xcombo', 'amikomini', 'amikoalien', 'zgemmash1', 'zgemmash2', 'zgemmas2s', 'zgemmass', 'vuzero', 'et4x00', 'xp1000', 'tm2t', 'tmsingle', 'odimm7', 'vusolo2', 'tmnano','tmnanose', 'tmnano2super','tmnano3t','iqonios300hd', 'e3hd', 'dm500hdv2', 'dm500hd', 'dm800', 'ebox7358', 'eboxlumi', 'ebox5100','ixusszero', 'optimussos1', 'enfinity', 'uniboxhd1'):
 		del modes["YPbPr"]
-	if modes.has_key("Scart") and getBoxType() in ('evomini', 'x1plus', 'xcombo', 'zgemmash1', 'zgemmash2', 'zgemmas2s', 'zgemmass', 'vuzero', 'tmnano', 'tmnano3t','tmnano2super'):
+	if modes.has_key("Scart") and getBoxType() in ('evomini', 'x1plus', 'xcombo', 'x2plus', 'zgemmash1', 'zgemmash2', 'zgemmas2s', 'zgemmass', 'vuzero', 'tmnano', 'tmnano3t','tmnano2super'):
 		modes["RCA"] = modes["Scart"]
 		del modes["Scart"]		
 	if modes.has_key("Scart") and getBoxType() in ('gbquad', 'et5x00', 'ixussone', 'et6x00', 'tmnano','tmnanose', 'tmnano2t', 'tmnano2super'):
