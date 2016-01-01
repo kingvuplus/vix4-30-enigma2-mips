@@ -388,7 +388,7 @@ def InitAVSwitch():
 			# TRANSLATORS: (aspect ratio policy: always try to display as fullscreen, when there is no content (black bars) on left/right, even if this breaks the aspect.
 			policy2_choices.update({"auto": _("Auto")})
 		f.close()	
-	config.av.policy_169 = ConfigSelection(choices=policy2_choices, default = "letterbox")
+	config.av.policy_169 = ConfigSelection(choices=policy2_choices, default = "bestfit")
 	policy_choices = {
 	# TRANSLATORS: (aspect ratio policy: black bars on left/right) in doubt, keep english term.
 	"panscan": _("Pillarbox"),
@@ -404,7 +404,7 @@ def InitAVSwitch():
 			# TRANSLATORS: (aspect ratio policy: always try to display as fullscreen, when there is no content (black bars) on left/right, even if this breaks the aspect.
 			policy_choices.update({"auto": _("Auto")})
 		f.close()
-	config.av.policy_43 = ConfigSelection(choices=policy_choices, default = "panscan")
+	config.av.policy_43 = ConfigSelection(choices=policy_choices, default = "bestfit")
 	config.av.tvsystem = ConfigSelection(choices = {"pal": _("PAL"), "ntsc": _("NTSC"), "multinorm": _("multinorm")}, default="pal")
 	config.av.wss = ConfigEnableDisable(default = True)
 	config.av.generalAC3delay = ConfigSelectionNumber(-1000, 1000, 5, default = 0)
